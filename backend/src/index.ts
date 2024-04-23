@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { decode, sign, verify } from "hono/jwt";
+import { compareSync, hashSync, genSaltSync } from "bcrypt";
+
+const salt = genSaltSync(10);
 
 const app = new Hono<{
   Bindings: {
@@ -25,14 +28,30 @@ app.post("/signup", async (c) => {
   const body = await c.req.json();
 
   try {
+    const findUserInDb = await prisma.user.findUnique({
+      where: {
+        email: body.email,
+      },
+    });
+
+    if (findUserInDb) {
+      return c.json({ message: "User already exists" });
+    }
+
+    const hashedPassword = hashSync(body.password, salt);
+
     const user = await prisma.user.create({
       data: {
         email: body.email,
-        password: body.password,
+        password: hashedPassword,
       },
     });
     const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
-    return c.json({ message: "Registration successful", data: jwt });
+    return c.json({
+      message: "Registration successful",
+      token: jwt,
+      data: user,
+    });
   } catch (err) {
     // c.status(411);
     return c.json({ message: "There was an error signing up" });
@@ -49,7 +68,6 @@ app.post("/signin", async (c) => {
     const user = await prisma.user.findUnique({
       where: {
         email: body.email,
-        password: body.password,
       },
     });
 
@@ -57,8 +75,18 @@ app.post("/signin", async (c) => {
       return c.json({ message: "Invalid username or password" });
     }
 
+    const isPasswordValid = compareSync(body.password, user.password);
+
+    if (!isPasswordValid) {
+      return c.json({ message: "Invalid username or password" });
+    }
+
     const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
-    return c.json({ message: "Logged in successfully", data: jwt });
+    return c.json({
+      message: "Logged in successfully",
+      token: jwt,
+      data: user,
+    });
   } catch (err) {
     return c.json({ message: "Error logging in" });
   }
@@ -71,12 +99,12 @@ app.post("/blog", async (c) => {
 
   const body = await c.req.json();
 
-  const blog = await prisma.post.create({
-    data: {
-      title: body.title,
-      content: body.content,
-    },
-  });
+  // const blog = await prisma.post.create({
+  //   data: {
+  //     title: body.title,
+  //     content: body.content,
+  //   },
+  // });
 
   return c.text("New blog created");
 });
