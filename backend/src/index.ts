@@ -1,10 +1,7 @@
 import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
-import { decode, sign, verify } from "hono/jwt";
-import { compareSync, hashSync, genSaltSync } from "bcrypt";
-
-const salt = genSaltSync(10);
+import { sign, verify } from "hono/jwt";
 
 const app = new Hono<{
   Bindings: {
@@ -38,12 +35,10 @@ app.post("/signup", async (c) => {
       return c.json({ message: "User already exists" });
     }
 
-    const hashedPassword = hashSync(body.password, salt);
-
     const user = await prisma.user.create({
       data: {
         email: body.email,
-        password: hashedPassword,
+        password: body.password,
       },
     });
     const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
@@ -54,6 +49,7 @@ app.post("/signup", async (c) => {
     });
   } catch (err) {
     // c.status(411);
+    console.log(err);
     return c.json({ message: "There was an error signing up" });
   }
 });
@@ -75,9 +71,7 @@ app.post("/signin", async (c) => {
       return c.json({ message: "Invalid username or password" });
     }
 
-    const isPasswordValid = compareSync(body.password, user.password);
-
-    if (!isPasswordValid) {
+    if (body.password != user.password) {
       return c.json({ message: "Invalid username or password" });
     }
 
@@ -92,33 +86,123 @@ app.post("/signin", async (c) => {
   }
 });
 
+// middleware
+
+app.use("/blog/*", async (c, next) => {
+  try {
+    const jwt = c.req.header("Authorization");
+
+    if (!jwt) {
+      c.status(401);
+      return c.json({ message: "Unauthorized" });
+    }
+
+    const decodedToken = await verify(jwt, c.env.JWT_SECRET);
+
+    if (!decodedToken) {
+      c.status(401);
+      return c.json({ message: "Invalid token" });
+    }
+
+    c.set("jwtPayload", decodedToken.id);
+    await next();
+  } catch (err) {
+    c.status(400);
+    return c.json({ message: "Server error" });
+  }
+});
+
 app.post("/blog", async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
-  const body = await c.req.json();
+  try {
+    const body = await c.req.json();
 
-  // const blog = await prisma.post.create({
-  //   data: {
-  //     title: body.title,
-  //     content: body.content,
-  //   },
-  // });
+    const userId = c.get("jwtPayload");
 
-  return c.text("New blog created");
+    const newBlog = await prisma.post.create({
+      data: {
+        title: body.title,
+        content: body.content,
+        authorId: userId,
+      },
+    });
+
+    return c.json({ message: "New blog created.", data: newBlog });
+  } catch (err) {
+    c.status(400);
+    return c.json({ message: "Server error" });
+  }
 });
 
-app.put("/blog/:id", (c) => {
-  return c.text("edited blog");
+app.put("/blog/:id", async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const body = await c.req.json();
+    const userId = c.get("jwtPayload");
+    const id = await c.req.param("id");
+    const updatedBlog = await prisma.post.update({
+      where: {
+        id,
+        authorId: userId,
+      },
+      data: {
+        title: body.title,
+        content: body.content,
+      },
+    });
+
+    return c.json({
+      message: `Blog with id ${id} has been updated.`,
+      data: updatedBlog,
+    });
+  } catch (err) {
+    console.log(err);
+    c.status(400);
+    return c.json({ message: "Server error" });
+  }
 });
 
-app.get("/blog/:id", (c) => {
-  return c.text("fetch all blogs of an user");
+app.get("/blog/bulk", async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const blogs = await prisma.post.findMany({});
+    return c.json({ message: "All blogs fetched", data: blogs });
+  } catch (err) {
+    c.status(400);
+    return c.json({ message: "Server error" });
+  }
 });
 
-app.get("/blog/bulk", (c) => {
-  return c.text("get all blogs for landing page");
+app.get("/blog/:id", async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const id = await c.req.param("id");
+    const blog = await prisma.post.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return c.json({
+      message: `Blog with id ${id} has been fetched.`,
+      data: blog,
+    });
+  } catch (err) {
+    c.status(400);
+    return c.json({ message: "Server error" });
+  }
 });
 
 export default app;
