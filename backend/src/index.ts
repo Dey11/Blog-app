@@ -2,6 +2,12 @@ import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { sign, verify } from "hono/jwt";
+import {
+  signinInput,
+  signupInput,
+  createBlogInput,
+  updateBlogInput,
+} from "@dey11/blog";
 
 const app = new Hono<{
   Bindings: {
@@ -23,6 +29,13 @@ app.post("/signup", async (c) => {
   }).$extends(withAccelerate());
 
   const body = await c.req.json();
+
+  const { success } = signupInput.safeParse(body);
+
+  if (!success) {
+    c.status(400);
+    return c.json({ message: "Invalid input" });
+  }
 
   try {
     const findUserInDb = await prisma.user.findUnique({
@@ -59,6 +72,13 @@ app.post("/signin", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
   const body = await c.req.json();
+
+  const { success } = signinInput.safeParse(body);
+
+  if (!success) {
+    c.status(400);
+    return c.json({ message: "Invalid input" });
+  }
 
   try {
     const user = await prisma.user.findUnique({
@@ -117,9 +137,13 @@ app.post("/blog", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
+  const body = await c.req.json();
+  const { success } = createBlogInput.safeParse(body);
+  if (!success) {
+    c.status(400);
+    return c.json({ message: "Invalid input" });
+  }
   try {
-    const body = await c.req.json();
-
     const userId = c.get("jwtPayload");
 
     const newBlog = await prisma.post.create({
@@ -142,8 +166,13 @@ app.put("/blog/:id", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
+  const body = await c.req.json();
+  const { success } = updateBlogInput.safeParse(body);
+  if (!success) {
+    c.status(400);
+    return c.json({ message: "Invalid input" });
+  }
   try {
-    const body = await c.req.json();
     const userId = c.get("jwtPayload");
     const id = await c.req.param("id");
     const updatedBlog = await prisma.post.update({
