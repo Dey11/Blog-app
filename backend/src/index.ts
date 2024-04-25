@@ -8,6 +8,7 @@ import {
   createBlogInput,
   updateBlogInput,
 } from "@dey11/blog";
+import { cors } from "hono/cors";
 
 const app = new Hono<{
   Bindings: {
@@ -16,6 +17,12 @@ const app = new Hono<{
   };
 }>();
 
+app.use(
+  "/*",
+  cors({
+    origin: ["http://localhost:5173", "https://dey-blog.vercel.app"],
+  })
+);
 app.get("/", (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
