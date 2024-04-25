@@ -5,6 +5,8 @@ import Home from "./pages/Home";
 import { RecoilRoot } from "recoil";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Blogs from "./pages/Blogs";
+import FullBlog from "./components/FullBlog";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,14 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
+      },
+      {
+        path: "/blogs",
+        element: <Blogs />,
+      },
+      {
+        path: "/blogs/:id",
+        element: <FullBlog />,
       },
     ],
   },
