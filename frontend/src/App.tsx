@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Blogs from "./pages/Blogs";
 import FullBlog from "./components/FullBlog";
+import CreateBlogs from "./pages/CreateBlogs";
 
 const router = createBrowserRouter([
   {
@@ -30,8 +31,21 @@ const router = createBrowserRouter([
         element: <Blogs />,
       },
       {
+        path: "/blogs/create",
+        element: <CreateBlogs />,
+      },
+      {
         path: "/blogs/:id",
-        element: <FullBlog />,
+        element: (
+          <FullBlog
+            title="Title"
+            date="26-04-2024"
+            content="Content"
+            username="Shreyan Dey"
+            bio="Master of mirth, purveyor of puns, and the funniest person in the
+              kingdom."
+          />
+        ),
       },
     ],
   },
