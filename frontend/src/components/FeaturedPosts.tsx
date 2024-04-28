@@ -1,5 +1,3 @@
-import React from "react";
-
 const FeaturedPosts = () => {
   return (
     <div className="pb-20 border-b-2">

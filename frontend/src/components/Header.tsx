@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { authState } from "../recoil/atoms/authState";

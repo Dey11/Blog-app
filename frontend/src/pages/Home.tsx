@@ -2,7 +2,6 @@ import Categories from "../components/Categories";
 import FeaturedPosts from "../components/FeaturedPosts";
 import LandingImage from "../assets/landing.jpg";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { authState } from "../recoil/atoms/authState";
 
