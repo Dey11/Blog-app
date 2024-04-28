@@ -113,6 +113,44 @@ app.post("/signin", async (c) => {
   }
 });
 
+app.get("/auth", async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  const jwt = c.req.header("Authorization");
+
+  if (!jwt) {
+    c.status(401);
+    return c.json({ message: "Unauthorized" });
+  }
+
+  try {
+    const decodedToken = await verify(jwt, c.env.JWT_SECRET);
+
+    if (!decodedToken) {
+      c.status(401);
+      return c.json({ message: "Invalid token" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decodedToken.id,
+      },
+    });
+
+    if (!user) {
+      c.status(401);
+      return c.json({ message: "Invalid token" });
+    }
+
+    return c.json({ message: "User authenticated", data: user });
+  } catch (err) {
+    c.status(400);
+    return c.json({ message: "Server error" });
+  }
+});
+
 // middleware
 
 app.use("/blog/*", async (c, next) => {
