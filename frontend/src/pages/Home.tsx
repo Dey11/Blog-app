@@ -2,19 +2,8 @@ import Categories from "../components/Categories";
 import FeaturedPosts from "../components/FeaturedPosts";
 import LandingImage from "../assets/landing.jpg";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import { authState } from "../recoil/atoms/authState";
 
 const Home = () => {
-  const [auth, setAuth] = useRecoilState(authState);
-
-  // useEffect(() => {
-  //   const user = localStorage.getItem("token");
-  //   if (user) {
-  //     setAuth(JSON.parse(user));
-  //   }
-  // }, []);
-
   return (
     <div className="mx-5">
       <div className="grid grid-cols-2 pb-20 ">

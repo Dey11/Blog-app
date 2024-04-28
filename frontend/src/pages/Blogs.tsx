@@ -1,10 +1,10 @@
 import BlogCard from "../components/BlogCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+// import { BACKEND_URL } from "../config";
 
 const Blogs = () => {
-  const [blogs, setBlogs] = useState([]);
+  const [_, setBlogs] = useState([]);
 
   const fetchBlogs = async () => {
     try {

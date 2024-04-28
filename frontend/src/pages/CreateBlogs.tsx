@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import { BACKEND_URL, TINY_API_KEY } from "../config";
+// import { BACKEND_URL, TINY_API_KEY } from "../config";
 import { CreateBlogType } from "@dey11/blog";
 import axios from "axios";
 

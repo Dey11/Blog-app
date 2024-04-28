@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+// import { BACKEND_URL } from "../config";
 import { SignupType } from "@dey11/blog";
 import { useRecoilState } from "recoil";
 import { authState } from "../recoil/atoms/authState";
@@ -12,7 +12,7 @@ const Register = () => {
     email: "",
     password: "",
   });
-  const [auth, setAuth] = useRecoilState(authState);
+  const [_, setAuth] = useRecoilState(authState);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: any) => {

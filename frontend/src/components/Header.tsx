@@ -2,10 +2,11 @@ import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { authState } from "../recoil/atoms/authState";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+import { useEffect } from "react";
 
 const Header = () => {
   const [auth, setAuth] = useRecoilState(authState);
+  // const BACKEND_URL = process.env.BACKEND_URL;
 
   const handleLogout = () => {
     localStorage.removeItem("token");

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "../config";
+// import { BACKEND_URL } from "../config";
 import { SigninType } from "@dey11/blog";
 import { useRecoilState } from "recoil";
 import { authState } from "../recoil/atoms/authState";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [auth, setAuth] = useRecoilState(authState);
+  const [_, setAuth] = useRecoilState(authState);
   const [loginData, setLoginData] = useState<SigninType>({
     email: "",
     password: "",
