@@ -6,6 +6,8 @@ import { useRecoilState } from "recoil";
 import { authState } from "../recoil/atoms/authState";
 import { useNavigate } from "react-router-dom";
 
+const BACKEND_URL = process.env.BACKEND_URL;
+
 const Register = () => {
   const [registerData, setRegisterData] = useState<SignupType>({
     name: "",

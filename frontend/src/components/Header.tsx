@@ -4,9 +4,9 @@ import { authState } from "../recoil/atoms/authState";
 import axios from "axios";
 import { useEffect } from "react";
 
+const BACKEND_URL = process.env.BACKEND_URL;
 const Header = () => {
   const [auth, setAuth] = useRecoilState(authState);
-  // const BACKEND_URL = process.env.BACKEND_URL;
 
   const handleLogout = () => {
     localStorage.removeItem("token");

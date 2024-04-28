@@ -4,6 +4,9 @@ import { Editor } from "@tinymce/tinymce-react";
 import { CreateBlogType } from "@dey11/blog";
 import axios from "axios";
 
+const BACKEND_URL = process.env.BACKEND_URL;
+const TINY_API_KEY = process.env.TINY_API_KEY;
+
 export default function CreateBlogs() {
   const [data, setData] = useState<CreateBlogType>({
     title: "",

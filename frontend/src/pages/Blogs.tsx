@@ -2,6 +2,7 @@ import BlogCard from "../components/BlogCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 // import { BACKEND_URL } from "../config";
+const BACKEND_URL = process.env.BACKEND_URL;
 
 const Blogs = () => {
   const [_, setBlogs] = useState([]);
