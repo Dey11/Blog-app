@@ -8,6 +8,10 @@ import Register from "./pages/Register";
 import Blogs from "./pages/Blogs";
 import FullBlog from "./components/FullBlog";
 import CreateBlogs from "./pages/CreateBlogs";
+import Features from "./pages/Features";
+import Pricing from "./pages/Pricing";
+import Contact from "./pages/Contact";
+import About from "./pages/About";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +21,19 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "/features",
+        element: <Features />,
+      },
+      {
+        path: "/pricing",
+        element: <Pricing />,
+      },
+      { path: "/contact", element: <Contact /> },
+      {
+        path: "/about",
+        element: <About />,
       },
       {
         path: "/login",

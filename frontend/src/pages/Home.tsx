@@ -1,8 +1,21 @@
 import Categories from "../components/Categories";
 import FeaturedPosts from "../components/FeaturedPosts";
 import LandingImage from "../assets/landing.jpg";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
+import { authState } from "../recoil/atoms/authState";
 
 const Home = () => {
+  const [auth, setAuth] = useRecoilState(authState);
+
+  // useEffect(() => {
+  //   const user = localStorage.getItem("token");
+  //   if (user) {
+  //     setAuth(JSON.parse(user));
+  //   }
+  // }, []);
+
   return (
     <div className="mx-5">
       <div className="grid grid-cols-2 pb-20 ">
@@ -26,6 +39,7 @@ const Home = () => {
 export default Home;
 
 const LandingLeft = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col gap-5">
       <h1 className=" font-semibold text-6xl">
@@ -35,7 +49,12 @@ const LandingLeft = () => {
         Explore a diverse range of topics, from lifestyle and technology to
         personal growth and entertainment.
       </div>
-      <button className=" bg-black text-white px-5 font-thin py-2 rounded-md">
+      <button
+        className="bg-black text-white px-5 font-thin py-2 rounded-md"
+        onClick={() => {
+          navigate("/blogs");
+        }}
+      >
         Explore the blog
       </button>
     </div>

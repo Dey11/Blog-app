@@ -21,12 +21,11 @@ const Login = () => {
         email: loginData.email,
         password: loginData.password,
       });
-      // console.log(res.data);
       const token = res.data.token;
       setAuth({
-        id: res.data.id,
-        name: res.data.name || "User",
-        email: res.data.email,
+        id: res.data.data.id,
+        name: res.data.data.name,
+        email: res.data.data.email,
       });
       localStorage.setItem("token", token);
       navigate("/");
